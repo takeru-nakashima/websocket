@@ -1,6 +1,7 @@
 ## 参考
 - [React HooksでWebSocket通信を行うサンプル](https://qiita.com/yonetty/items/acc46afa59da1796a767)
 - [チャットアプリに入室機能とユーザ名表示機能を追加する](https://tomiko0404.hatenablog.com/entry/2021/12/31/React-chatapp-2)
+- [Socket.ioを使ったチャットルーム ロジックの実装](https://qiita.com/ynunokawa/items/564757fe6dbe43d172f8)
 
 ## 気になったこと
 - .envや.env.localなど複数存在するプロジェクトを見かけるがどのように.env.localを使用する？勝手に読み込まれるのかな？

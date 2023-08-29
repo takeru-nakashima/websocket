@@ -7,7 +7,8 @@ export const Chat = () => {
 
   // useNavigateで受信したデータを取得
   const location = useLocation();
-  const name = location.state.name;
+  // useLocation()で値が取得できない際にはstateでエラーになる為null,undefined許容
+  const name = location.state?.name ?? 'ゲスト';
 
   const [messages, setMessages] = useState([
     {
