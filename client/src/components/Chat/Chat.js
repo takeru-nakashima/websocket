@@ -18,6 +18,9 @@ export const Chat = () => {
     },
   ]);
   const [text, setText] = useState("");
+  const [roomId, setRoomId]  = useState('');
+  
+  const socketRef = useRef();
 
   const handleInputChange = (e) => {
     console.log(e.target.value);
@@ -36,12 +39,11 @@ export const Chat = () => {
     setText("");
   };
 
-  const socketRef = useRef();
 
   useEffect(() => {
     console.log("Connecting ..");
     socketRef.current = io();
-    socketRef.current.on("broadcast", (payload) => {
+    socketRef.current.on("sendSpecificRoom", (payload) => {
       console.log("Received: " + payload);
       setMessages((prevMessages) => [...prevMessages, payload]);
     });
@@ -53,6 +55,15 @@ export const Chat = () => {
 
   return (
     <div>
+      <select onChange={(event) => {
+        setRoomId(event.target.value);
+        socketRef.current.emit('joinRoom', {roomId: event.target.value});
+      }}>
+        <option value="">---</option>
+        <option value="room1">Room1</option>
+        <option value="room2">Room2</option>
+      </select>
+
       <div className="input">
         <input
           type="text"
