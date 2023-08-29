@@ -1,29 +1,34 @@
-const app = require('express');
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
-require('dotenv').config();
+const app = require("express");
+const server = require("http").createServer(app);
+const io = require("socket.io")(server);
+require("dotenv").config();
 
 const PORT = process.env.WEBSOCKET_SERVER_PORT || 3003;
-console.log(PORT)
+console.log(PORT);
 
-let roomId = '';
+let roomId = "";
 
-io.on('connection', (socket) => {
-    socket.on('send', (payload) => {
-        socket.to(roomId).emit('sendSpecificRoom', payload)
-    });
-    
-    socket.on('joinRoom', (message) => {
-        console.log(message.roomId+"に入室しました。")
-        roomId = message.roomId;
-        socket.join(message.roomId)
-    })
+io.on("connection", (socket) => {
 
-    socket.on('disconnect', () => {
-        console.log('Connection closed');
-    })
-})
+  // ルーム機能
+  socket.on("joinRoom", (message) => {
+    console.log(message.roomId + "に入室しました。");
+    roomId = message.roomId;
+    // 入室（ルーム機能)
+    socket.join(message.roomId);
+  });
+
+  // クライアントから入力されたメッセージをそのままチャットルームに返す
+  socket.on("send", (payload) => {
+    socket.to(roomId).emit("send", payload);
+  });
+
+  // disconnect
+  socket.on("disconnect", () => {
+    console.log("Connection closed");
+  });
+});
 
 server.listen(PORT, () => {
-    console.log('Listening...')
-})
+  console.log("Listening...");
+});
