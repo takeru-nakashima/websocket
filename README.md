@@ -23,3 +23,57 @@
 - FE, BEのwebsocketの結合はそれぞれでsocket.io, socket.io-clientライブラリを使用する。
 - 入室機能（簡単なログイン的な）でユーザー名の情報を保持することができる。
 - ルーム機能：FEからルーム情報を同じようにemitして、BE側でsocket.joinをして入室するだけ
+
+## docker間通信
+  "proxy": "http://server_websocket:5001", 
+  この書き方だとなぜかいけた。謎　他のコンテナから他のコンテナをみる場合には以下のように置き換える
+  
+  docker内部の通信 portはホスト名など```
+  http => service name
+  localhost => container_name
+  portはdocker内部を見る。
+
+
+  ホストマシンからdocker内部にアクセスすることはできなそう
+  - × localhost => docker内部
+  - ○  docker内部 => localhost
+  - ◎  docker内部 => docker内部
+
+なのでmigrateを行う際には、一回docker内部のexpressからdb を実行する必要がある。
+
+## sequelize
+    
+### 疑問
+ - config.jsonはdevelopment, test, productionは、developmentをlocal環境では実行されるけどなんで？
+ - npx sequelize-cli db:migrate
+
+docker + node.js + postgresqlを接続
+ https://qiita.com/rockguitar67/items/0020d734201632077cb5
+
+sequelizqをnpxをつけずに実行することできないの？
+ 
+### ライブラリインストール
+```
+npm install --save pg pg-hstore sequelize sequelize-cli
+```
+### 初期化
+```
+ npx sequelize-cli init
+```
+### modelを作る（同時にカラムも作成
+```
+npx sequelize-cli model:generate --name user --attributes firstName:string,lastName:string,email:string
+```
+### マイグレーション
+```
+npx sequelize-cli db:migrate
+```
+
+試したいこと
+```
+- expressでsequelizeを使用する
+- pg, seqluzeどちらかしかできないこと　seqluzeでストアどプロシージャーの登録できないのかな？
+- npx sequelize-cli db:migrateの　npxを取り除くことはできなないの？
+- 今までの開発では、modelを直に触ってdbから値を取得することをしたことがないため不識
+- repository, entityを使った開発をしたいがどのように組み込めば良い？
+```

@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  client:
+    stdin_open: true
+    container_name: client
+    build: ./docker/react
+    ports:
+      - "3007:3000"
+    command: "/bin/sh -c 'sh /home/node/app/entrypoint.sh'"
+    tty: true
+    volumes:
+      - ./client:/home/node/app/client #マウントするのは ./client:/home/node/appの方が良くね？
+
+  server_websocket:
+    container_name: server_websocket
+    build: ./docker/socket
+    ports:
+      - "5007:5001"
+    command: "/bin/sh -c 'sh /home/node/app/entrypoint.sh'"
+    tty: true
+    volumes:
+      - ./server:/home/node/app/server #マウントするのは ./server:/home/node/appの方が良くね？
+
+  db:
+    image: postgres:14
+    container_name: postgres
+    ports:
+      - 5435:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=password
+volumes:
+  postgres-data:
+
+# image
+# - docker imageでdocker内部のどこにおくか配置
+# - entrypoint.shなどのシェルも実行させることが可能
+
+# docker-comose.yml
+# - container名を決める
+# - どのdocker imageを使用するか決める
+# - portを決める
+# - 起動時にシェルを実行するようにする。
+#　directory
+# - container_name
+# - build
+# - port
+# - shell
+# - volume
+
+
+# 不明
+# 1, buildはなぜDockerfileが自動で読み込まれるの？
+# 2, sh, bash, zshなどどれが使えてどれが使えないの？
+# 3, その他の細かいdocker-compse.ymlファイルに書くオプションは知らない。
+# 4, dockerの内部にログが流れていないんだけどなんで？
+# 5, entrypoint.shで実行されるnpm startが途中で終了になったりしないの？
+
+# わかったこと
+# node.jsのサバーportはdockerの中ではどうなるのか？
+# 異なるポートでnode.jsサーバーを起動してもエラーにはならないが、動かない。
+# expressサーバーを内部ポートに合わせて起動しておく必要がある。
+
+# docker内部でnpm startしているから関係ない。
+
+# 2回目以降のdocker-compose up はrunのみでbuildはされない
+# https://qiita.com/Mayumi_Pythonista/items/f69f7a1e8b0bbeab9560
+# docker-compose up -d
+# docker-compose down -v
+# docker-compose up -d --build
+
+
+# ホストマシンからdocker内部のpostgresqlにmigrateを行うとエラー　ホスト名の名前解決ができない。
+# サービス名とホスト名は何が良いのかな？
+
+# docker内部に入って起動する必要があるということ
+# sequlizeの箇所でmigrateに失敗するがこの原因がdocker内部のserverからmigrateをしているので、
+# docker内部のserverからmigarteを実行するには、server内部から見たホスト名で実行しないといけない。
+# dockerのサービス名とコンテナ名の命名は何が最適なんだろうね。
